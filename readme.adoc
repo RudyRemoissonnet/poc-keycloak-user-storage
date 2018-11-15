@@ -1,0 +1,87 @@
+= poc Keycloak User Storage
+
+this poc is based on:
+
+* https://github.com/thomasdarimont/keycloak-user-storage-provider-demo
+* https://github.com/dasniko/keycloak-user-spi-demo/blob/master/pom.xml
+
+== installation
+
+=== intro
+
+modules :
+
+* siu-user-storage : user storage implementation to validate user using external rest API named SIU
+* siu-user-storage-bundle : siu-user-storage module packaged as ear
+
+=== start keycloak
+
+ wget https://downloads.jboss.org/keycloak/4.6.0.Final/keycloak-4.6.0.Final.tar.gz
+ tar -zxvf keycloak-4.6.0.Final.tar.gz
+ export KEYCLOAK_HOME="$(pwd)/keycloak-4.6.0.Final"
+ echo "yes" | $KEYCLOAK_HOME/bin/jboss-cli.sh --file=setup.cli
+ $KEYCLOAK_HOME/bin/standalone.sh -c standalone-ha.xml
+
+=== build & deploy
+
+ mvn clean install
+ mvn wildfly:deploy -Djboss-as.home=$KEYCLOAK_HOME -pl siu-user-storage-bundle
+
+=== setup user storage provider
+
+create admin user from
+
+ http://localhost:8080
+
+
+add user storage provider from
+
+ http://localhost:8080/auth/admin/master/console/#/realms/master/user-federation
+
+select demo-user-provider and save with default settings
+
+=== validate configuration
+
+try to log in user account management console using siu as username and whatever as password
+
+ http://localhost:8080/auth/realms/master/account
+
+=== using token
+
+create client with id demo-client and keep other default settings from
+
+ http://localhost:8080/auth/admin/master/console/#/realms/master/clients
+
+in demo-client settings change Access Type to confidential and switch off Standard Flow Enabled button then save
+
+following curl should provide token
+
+ curl -i -d 'client_id=demo-client' \
+         -d 'client_secret=9ceb02f6-08a4-4143-b0fa-870c6b8860c1'  \
+         -d 'username=siu' \
+         -d 'password=whatever' \
+         -d 'grant_type=password' \
+            'http://localhost:8080/auth/realms/master/protocol/openid-connect/token'
+
+IMPORTANT: client_secret value must be change to value of field secret from credentials tab of demo-client configuration
+
+=== add token field
+
+UserAdapter class constructor add field using setSingleAttribute method.
+in order to have this value in token do some configuration must be done :
+
+in administration console, go to mappers tab of client demo-client, and create mappers as :
+
+* name: siuId
+* mapper type: User Attribute
+* user attribute: siuId
+* token claim name: siuId
+* claim JSON type: string
+
+keep all other as default.
+
+
+
+
+
+
