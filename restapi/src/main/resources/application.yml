@@ -1,0 +1,12 @@
+server:
+  port: 8081
+
+keycloak:
+  auth-server-url: http://localhost:8080/auth/
+  resource: demo-beareronly
+  realm: master
+  public-client: false
+  principal-attribute: preferred_username
+  bearer-only: true
+  credentials:
+    secret: 61f92b76-4447-4140-aea9-e0a51ddcfaa9

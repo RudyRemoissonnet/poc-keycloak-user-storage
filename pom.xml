@@ -12,7 +12,9 @@
     <modules>
         <module>siu-user-storage</module>
         <module>siu-user-storage-bundle</module>
-        <!--<module>cloud-user-storage</module>-->
+        <module>cloud-user-storage</module>
+        <module>cloud-user-storage-bundle</module>
+        <module>restapi</module>
     </modules>
 
     <properties>

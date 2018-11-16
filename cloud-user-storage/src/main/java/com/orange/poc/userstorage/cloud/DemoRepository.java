@@ -1,10 +1,5 @@
-package com.orange.poc.userstorage;
+package com.orange.poc.userstorage.cloud;
 
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.HttpClientBuilder;
-
-import java.io.IOException;
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -19,7 +14,7 @@ class DemoRepository {
 
     DemoRepository() {
         users = new HashMap<>();
-        users.put("siu", new DemoUser("1", "siu"));
+        users.put("cloud", new DemoUser("1", "cloud"));
     }
 
     Collection<DemoUser> getAllUsers() {
@@ -45,13 +40,8 @@ class DemoRepository {
         logger.info(format("validateCredentials : %s, %s",  username, password));
         DemoUser user = findUserByUsernameOrEmail(username);
         if (user != null) {
-            try {
-                CloseableHttpResponse response = HttpClientBuilder.create().build().execute(new HttpGet("http://localhost:8080/auth/realms/master"));
-                logger.info("siu external api should be call to validate credential, dummy response here is " + response.getStatusLine().getStatusCode());
-                return true;
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            logger.info("cloud user storage implementation");
+            return true;
         }
         logger.info("not validated");
         return false;

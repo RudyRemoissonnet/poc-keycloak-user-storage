@@ -1,4 +1,4 @@
-package com.orange.poc.userstorage;
+package com.orange.poc.userstorage.cloud;
 
 public class DemoUser {
 

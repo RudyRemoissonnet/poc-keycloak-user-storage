@@ -1,9 +1,10 @@
-= poc Keycloak User Storage
+= demo Keycloak User Storage
 
-this poc is based on:
+this demo is based on:
 
 * https://github.com/thomasdarimont/keycloak-user-storage-provider-demo
-* https://github.com/dasniko/keycloak-user-spi-demo/blob/master/pom.xml
+* https://github.com/dasniko/keycloak-user-spi-demo
+* https://github.com/jinnerbichler/blog/tree/master/keycloak_4_spring_boot_2
 
 == installation
 
@@ -13,6 +14,7 @@ modules :
 
 * siu-user-storage : user storage implementation to validate user using external rest API named SIU
 * siu-user-storage-bundle : siu-user-storage module packaged as ear
+* restapi : module to test integration
 
 === start keycloak
 
@@ -26,13 +28,13 @@ modules :
 
  mvn clean install
  mvn wildfly:deploy -Djboss-as.home=$KEYCLOAK_HOME -pl siu-user-storage-bundle
+ mvn wildfly:deploy -Djboss-as.home=$KEYCLOAK_HOME -pl cloud-user-storage-bundle
 
 === setup user storage provider
 
 create admin user from
 
  http://localhost:8080
-
 
 add user storage provider from
 
@@ -56,14 +58,14 @@ in demo-client settings change Access Type to confidential and switch off Standa
 
 following curl should provide token
 
- curl -i -d 'client_id=demo-client' \
-         -d 'client_secret=9ceb02f6-08a4-4143-b0fa-870c6b8860c1'  \
-         -d 'username=siu' \
-         -d 'password=whatever' \
-         -d 'grant_type=password' \
-            'http://localhost:8080/auth/realms/master/protocol/openid-connect/token'
+ curl -d 'client_id=demo-client' \
+      -d 'client_secret=9ceb02f6-08a4-4143-b0fa-870c6b8860c1'  \
+      -d 'username=siu' \
+      -d 'password=whatever' \
+      -d 'grant_type=password' \
+         'http://localhost:8080/auth/realms/master/protocol/openid-connect/token' | jq
 
-IMPORTANT: client_secret value must be change to value of field secret from credentials tab of demo-client configuration
+IMPORTANT: client_secret value must be change to value of field secret from credentials tab of demo-client client configuration
 
 === add token field
 
@@ -80,8 +82,31 @@ in administration console, go to mappers tab of client demo-client, and create m
 
 keep all other as default.
 
+=== using second user storage named cloud
 
+add cloud user storage provider.
+following curl should provide token :
 
+ curl -d 'client_id=demo-client' \
+      -d 'client_secret=9ceb02f6-08a4-4143-b0fa-870c6b8860c1'  \
+      -d 'username=cloud' \
+      -d 'password=whatever' \
+      -d 'grant_type=password' \
+         'http://localhost:8080/auth/realms/master/protocol/openid-connect/token' | jq
 
+=== integration
 
+create new client named demo-beareronly with access type bearer-only in keycloak administration console
+
+restapi module is a spring-boot application that exposes a secured resource /test
+
+start module :
+
+ mvn spring-boot:run -pl restapi
+
+IMPORTANT: credentials.secret value from src/main/resources/application.yml must be change to value of field secret from credentials tab of demo-beareronly client configuration
+
+test integration by running script :
+
+ sh script/restapi.sh
 

@@ -1,4 +1,4 @@
-package com.orange.poc.userstorage;
+package com.orange.poc.userstorage.cloud;
 
 import org.keycloak.component.ComponentModel;
 import org.keycloak.models.KeycloakSession;
