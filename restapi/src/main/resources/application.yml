@@ -10,3 +10,8 @@ keycloak:
   bearer-only: true
   credentials:
     secret: 61f92b76-4447-4140-aea9-e0a51ddcfaa9
+
+# default is false, should revert to default value when https://issues.jboss.org/browse/KEYCLOAK-8725 is fixed
+spring:
+  main:
+    allow-bean-definition-overriding: true
